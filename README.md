@@ -17,6 +17,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .claude/serve.ps1
 
 Дальше http://localhost:8099/prototype.html
 
+## Публикация
+
+Проект развёрнут на Vercel. `vercel.json` отдаёт `prototype.html` на корневом
+адресе — иначе хостинг ищет `index.html` и отвечает 404.
+`.vercelignore` не пускает на хостинг служебные файлы: `.claude/` и `CLAUDE.md`.
+
 ## Управление
 
 | Клавиша | Действие |
