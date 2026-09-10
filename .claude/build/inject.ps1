@@ -34,6 +34,7 @@ $shots = @(
   # screen 3
   @{ var="--icon-favicon"; file="$d\assets\s3_favicon.png";   mime="image/png" },
   @{ var="--icon-home";    file="$d\assets\s3_icon_home.png"; mime="image/png" },
+  @{ var="--icon-burger";  file="$d\assets\icon_burger.png";  mime="image/png" },
 
   # screen 5 - logos of traffic sources
   @{ var="--logo-yandex-direct"; file="$d\assets\s5_imgYandexDirect1.svg";           mime="image/svg+xml" },
