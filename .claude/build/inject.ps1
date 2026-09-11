@@ -26,10 +26,9 @@ $shots = @(
   @{ var="--icon-disk";    file="$d\assets\icon_disk.png";    mime="image/png" },
 
   # screen 2
-  @{ var="--shot-page";         file="$d\assets\s2_preview.jpg" },
-  @{ var="--report-visitors";   file="$d\assets\s2_visitors.png";     mime="image/png" },
-  @{ var="--icon-view-desktop"; file="$d\assets\s2_view_desktop.png"; mime="image/png" },
-  @{ var="--icon-view-mobile";  file="$d\assets\s2_view_mobile.png";  mime="image/png" },
+  @{ var="--page-main";     file="$d\assets\s2_page_main.jpg" },
+  @{ var="--page-price";    file="$d\assets\s2_page_price.jpg" },
+  @{ var="--page-contacts"; file="$d\assets\s2_page_contacts.jpg" },
 
   # screen 3
   @{ var="--icon-favicon"; file="$d\assets\s3_favicon.png";   mime="image/png" },
