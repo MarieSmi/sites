@@ -7,7 +7,9 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
+<!-- рамка демо: шапка и вспомогательная панель — github.com/MarieSmi/demo-frame -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/MarieSmi/demo-frame@1.0.0/demo-frame.css">
 
 <style>
 /* ==========================================================================
@@ -206,10 +208,6 @@
   --header-h:  46px;
   --tabs-h:    32px;
 
-  /* Оболочка вокруг холста — к макету не относится */
-  --shell-pad: 28px;
-  --shell-gap: 28px;
-  --nav-w:     248px;
 }
 
 *{ box-sizing: border-box; }
@@ -220,41 +218,33 @@ figure, figcaption{ margin: 0; }
 html, body{
   margin: 0;
   height: 100%;
-  background: #0f1012;
+  background: #fff;
   font-family: var(--font-ui);
   -webkit-font-smoothing: antialiased;
 }
 
 /* ==========================================================================
    2. ОБОЛОЧКА
-   Слева холст 1600×900, справа — панель шагов, между ними отступ.
-   Холст вписывается в оставшееся место, пропорции сохраняются,
-   апскейл выше 1:1 отключён (MAX_SCALE в скрипте).
+   Рамка демо — модуль demo-frame: шапка, холст 1600×900 и вспомогательная
+   панель справа масштабируются как одно целое под окно (скрипт модуля
+   задаёт холсту transform). Холст стоит в левом верхнем углу, под шапкой.
    ========================================================================== */
 #stage{
   position: fixed;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--shell-gap);
-  padding: var(--shell-pad);
   overflow: hidden;
 }
 
-#canvasWrap{
-  flex: none;
-  position: relative;
-  border-radius: 4px;
-  overflow: hidden;
-  box-shadow: 0 24px 80px rgba(0,0,0,.55);
-}
+#canvasWrap{ display: contents; }
 
 #canvas{
-  position: relative;
+  position: absolute;
+  left: 0;
+  top: 0;
   width: var(--canvas-w);
   height: var(--canvas-h);
   background: var(--c-bg);
+  border-radius: 8px;
   overflow: hidden;
   transform-origin: top left;
 }
@@ -270,80 +260,6 @@ html, body{
   letter-spacing: var(--tracking);
 }
 .screen.is-active{ display: flex; }
-
-/* ==========================================================================
-   3. ПАНЕЛЬ ШАГОВ
-   Имена берутся из data-name у <section> — это имена фреймов из Figma.
-   Клавиша H — скрыть/показать (холст при этом растягивается на всё окно).
-   ========================================================================== */
-#nav{
-  flex: none;
-  width: var(--nav-w);
-  max-height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 10px;
-  border-radius: 14px;
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.07);
-  overflow-y: auto;
-  user-select: none;
-}
-#nav[hidden]{ display: none; }
-
-#nav .nav__title{
-  font-size: 10px;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,.32);
-  padding: 6px 10px 10px;
-}
-
-#nav button{
-  appearance: none;
-  border: 0;
-  background: transparent;
-  font: inherit;
-  font-size: 13px;
-  line-height: 1.35;
-  color: rgba(255,255,255,.62);
-  text-align: left;
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  padding: 9px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background .12s, color .12s;
-}
-#nav button:hover{ background: rgba(255,255,255,.06); color: #fff; }
-#nav button[aria-current="true"]{
-  background: var(--c-brand);
-  color: #fff;
-}
-#nav button[aria-current="true"] .nav__idx{ color: rgba(255,255,255,.75); }
-
-#nav .nav__idx{
-  font-size: 11px;
-  color: rgba(255,255,255,.3);
-  flex: none;
-  width: 14px;
-}
-#nav .nav__name{
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-#nav .nav__hint{
-  font-size: 10px;
-  line-height: 1.6;
-  color: rgba(255,255,255,.24);
-  padding: 12px 10px 4px;
-  border-top: 1px solid rgba(255,255,255,.06);
-  margin-top: 8px;
-}
 
 /* ==========================================================================
    4. ИКОНКИ
@@ -3598,24 +3514,14 @@ html, body{
     </div>
   </div>
 
-  <nav id="nav" aria-label="Шаги прототипа">
-    <div class="nav__title">Шаги</div>
-    <div class="nav__hint">← → переход<br>H скрыть панель</div>
-  </nav>
-
 </div>
 
+<script src="https://cdn.jsdelivr.net/gh/MarieSmi/demo-frame@1.0.0/demo-frame.js"></script>
 <script>
 (function(){
   'use strict';
 
-  var MAX_SCALE = 1;                 // 1 = не увеличивать выше 1:1
-
-  var stage  = document.getElementById('stage');
-  var wrap   = document.getElementById('canvasWrap');
   var canvas = document.getElementById('canvas');
-  var nav    = document.getElementById('nav');
-  var hint   = nav.querySelector('.nav__hint');
 
   var screens = Array.prototype.slice.call(document.querySelectorAll('.screen'));
   var ids = screens.map(function(s){ return s.id; });
@@ -3702,38 +3608,23 @@ html, body{
     s.appendChild(rail);
   });
 
-  /* --- панель шагов: имена = data-name (имена фреймов) --------------------- */
-  screens.forEach(function(s, i){
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.dataset.goto = s.id;
-    b.title = s.dataset.name || s.id;
-    b.innerHTML =
-      '<span class="nav__idx">' + (i + 1) + '</span>' +
-      '<span class="nav__name"></span>';
-    b.querySelector('.nav__name').textContent = s.dataset.name || s.id;
-    nav.insertBefore(b, hint);
+  /* --- рамка демо: шапка, холст и вспомогательная панель справа ------------
+     Модуль demo-frame (github.com/MarieSmi/demo-frame) вписывает их в окно
+     как одно целое. Сценарий один — все семь экранов листаются переходами
+     внутри прототипа и стрелками ← →.                                      */
+  DemoFrame.mount({
+    stage: canvas,
+    head: { title: 'Конструктор сайтов — типовое представление' },
+    devices: [
+      { id: 'laptop', icon: 'laptop', label: 'Ноутбук', disabled: true },
+      { id: 'monitor', icon: 'monitor', label: 'Монитор', size: '1600х900', name: 'монитор' }
+    ],
+    device: 'monitor',
+    scenarios: [{ id: 'typical', title: 'Типовое представление' }],
+    links: [{ title: 'Макет — Типовое представление', href: 'https://www.figma.com/design/zdSksnoJrOiDyzWNokEfzk/?node-id=3861-70224' }],
+    team: [{ label: 'Design', name: 'Смирнова Мария' }, { label: 'Develop' }],
+    value: { scenario: 'typical' }
   });
-
-  /* --- масштабирование холста под свободное место -------------------------- */
-  function fit(){
-    var cs   = getComputedStyle(stage);
-    var pad  = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
-    var padY = parseFloat(cs.paddingTop)  + parseFloat(cs.paddingBottom);
-    var gap  = parseFloat(cs.columnGap) || 0;
-
-    var navW = nav.hidden ? 0 : nav.offsetWidth + gap;
-    var availW = window.innerWidth  - pad  - navW;
-    var availH = window.innerHeight - padY;
-
-    var s = Math.min(availW / canvas.offsetWidth, availH / canvas.offsetHeight, MAX_SCALE);
-    if (!(s > 0)) s = MAX_SCALE;
-
-    wrap.style.width  = Math.round(canvas.offsetWidth  * s) + 'px';
-    wrap.style.height = Math.round(canvas.offsetHeight * s) + 'px';
-    canvas.style.transform = 'scale(' + s + ')';
-  }
-  window.addEventListener('resize', fit);
 
   /* --- экраны и роутинг ---------------------------------------------------- */
   function idFromHash(){
@@ -3744,9 +3635,6 @@ html, body{
   function render(){
     var id = idFromHash();
     screens.forEach(function(s){ s.classList.toggle('is-active', s.id === id); });
-    Array.prototype.forEach.call(nav.querySelectorAll('button'), function(b){
-      b.setAttribute('aria-current', String(b.dataset.goto === id));
-    });
     var el = document.getElementById(id);
     document.title = 'Прототип — ' + (el.dataset.name || id);
   }
@@ -3777,14 +3665,9 @@ html, body{
     var i = ids.indexOf(idFromHash());
     if (e.key === 'ArrowRight') go(ids[Math.min(i + 1, ids.length - 1)]);
     if (e.key === 'ArrowLeft')  go(ids[Math.max(i - 1, 0)]);
-    if (e.key === 'h' || e.key === 'H' || e.key === 'р' || e.key === 'Р'){
-      nav.hidden = !nav.hidden;
-      fit();
-    }
   });
 
   render();
-  fit();
 })();
 </script>
 
