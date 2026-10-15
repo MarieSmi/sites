@@ -20,9 +20,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .claude/serve.ps1
 
 ## Публикация
 
-Проект развёрнут на Vercel. `vercel.json` отдаёт `prototype.html` на корневом
-адресе — иначе хостинг ищет `index.html` и отвечает 404.
-`.vercelignore` не пускает на хостинг служебные файлы: `.claude/` и `CLAUDE.md`.
+Только GitHub Pages: https://mariesmi.github.io/sites/ — публикуется из ветки
+`main` (корень) при каждом пуше. `index.html` переадресует на `prototype.html`,
+сохраняя адрес экрана. Vercel больше не используется: проект от репозитория отвязан.
 
 ## Управление
 
@@ -36,7 +36,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .claude/serve.ps1
 
 1. Стартовый экран — реестр сайтов
 2. Страницы
-3. Параметры
+3. Данные
 4. Статистика
 5. Источники
 6. Посетители
@@ -49,6 +49,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .claude/serve.ps1
 ## Что внутри
 
 - `prototype.html` — единственный артефакт, 1,2 МБ
+- `index.html` — переадресация на прототип для GitHub Pages
 - `CLAUDE.md` — решения по проекту, карта переходов, node-id фреймов Figma
 - `.claude/build/` — исходники ассетов и `inject.ps1`, который вшивает их
   в `prototype.html`. Нужен, только если ассеты меняются
