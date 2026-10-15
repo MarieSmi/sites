@@ -78,6 +78,7 @@
   --c-text-success:     #298e3c;
   --c-text-nav-active:  #000000;
   --c-text-placeholder: rgba(137,145,169,.6);
+  --c-text-label-contrast: #656c87;
 
   /* Background */
   --c-bg:               #ffffff;
@@ -91,6 +92,8 @@
   --c-bg-info:          #eeebff;
   --c-bg-info-active:   #d4ccff;
   --c-bg-contrast-pale: rgba(51,51,51,.05);
+  --c-bg-active:        #edeef2;
+  --c-pin:              #66cccc;
 
   /* Border */
   --c-border:            #eaeaea;
@@ -168,6 +171,7 @@
 
   --shadow-c: 0 0 8px rgba(0,0,0,.06);
   --shadow-b: 0 0 8px rgba(0,0,0,.14);
+  --shadow-a: drop-shadow(0 0 23px rgba(0,0,0,.12)) drop-shadow(0 0 7.5px rgba(0,0,0,.12));
 
   /* Толщина линии графика. В макете 2 px, но она там раздувается
      на подъёмах; здесь линия ровная, поэтому взято тоньше. */
@@ -489,20 +493,116 @@ html, body{
   width: 40px;
   background: var(--c-brand);
 }
-.btn--contrast{
-  width: 40px;
-  background: var(--c-bg);
-  border: 1px solid var(--c-border-pale);
-}
 .btn--ghost{
   width: var(--h-xl);
   height: var(--h-xl);
   padding: 2px 0 0;
 }
-/* Кнопки «+» и «ещё» стартового экрана — ховера в макете для них нет,
+/* --- пин: метка «здесь кликают» ------------------------------------------ */
+/* Компонент «Пин», Figma 3:105974 (Type=Клик). Демо-подсказка, а не часть
+   интерфейса: лежит внутри кликабельного элемента, клик всплывает к нему.
+   Место задаёт сам элемент: style="--pin-x: …; --pin-y: …" от левого верхнего
+   угла ближайшего предка с position. Hover=on в макете — при наведении на сам
+   пин он пропадает. Прозрачность, а не display: none — иначе пин исчезнет
+   из-под курсора, наведение снимется, и он начнёт мигать. */
+.pin{
+  position: absolute;
+  left: var(--pin-x, 0);
+  top: var(--pin-y, 0);
+  z-index: 1;
+  width: var(--h-m);
+  height: var(--h-m);
+}
+.pin:hover{ opacity: 0; }
+.pin::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--h-xl);
+  background: var(--c-pin);
+  opacity: .5;
+}
+.pin svg{
+  position: absolute;
+  left: 50%;
+  top: 62.5%;
+}
+
+/* --- выпадающее меню (BricksMenu) ---------------------------------------- */
+/* Шапка, из которой меню выпадает, его не обрезает. */
+.topbar--popups{ overflow: visible; position: relative; z-index: 2; }
+/* Меню позиционируется по вызывающему элементу — это осознанный absolute. */
+.popup-anchor{ position: relative; display: flex; }
+/* Окно встаёт так, что первая буква заголовка («Д») ложится на плюс:
+   центр «Д» в меню — (26, 22), центр плюса в кнопке — (20, 13). */
+.menu{
+  position: absolute;
+  left: -6px;
+  top: -9px;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  padding: var(--o-s) 0 var(--o-m);
+  border-radius: var(--r-s);
+  background: var(--c-bg);
+  filter: var(--shadow-a);
+}
+.menu[hidden]{ display: none; }
+.menu__header{
+  display: flex;
+  align-items: center;
+  height: var(--h-l);
+  margin: 0 var(--o-s) var(--o-xs);
+  padding-left: var(--o-m);
+}
+.menu__title{
+  flex: 1 0 0;
+  min-width: 0;
+  padding-right: var(--o-st);
+  white-space: nowrap;
+  font-size: var(--fs-m);
+  letter-spacing: 1.25px;
+  text-transform: uppercase;
+  color: var(--c-text-label);
+}
+.menu__close{
+  display: flex;
+  padding: 0 var(--o-2xs);
+  border: 0;
+  background: transparent;
+  color: var(--c-icon-secondary);
+  cursor: pointer;
+}
+.menu__close:hover{ color: var(--c-text); }
+.menu__list{
+  display: flex;
+  flex-direction: column;
+  gap: var(--o-xs);
+  list-style: none;
+  margin: 0;
+  padding: 0 var(--o-s);
+}
+.menu__item{
+  width: 100%;
+  min-height: var(--h-xl);
+  display: flex;
+  align-items: center;
+  padding: 1px var(--o-l) 0 var(--o-m);
+  border: 0;
+  border-radius: var(--o-l);
+  background: transparent;
+  font: inherit;
+  font-size: var(--fs-xl);
+  letter-spacing: inherit;
+  text-align: left;
+  color: var(--c-text);
+  cursor: pointer;
+}
+.menu__item:hover{ background: var(--c-list-hover); }
+
+/* Кнопка «+» стартового экрана — ховера в макете для неё нет,
    лёгкое затемнение, чтобы клик не был вслепую. */
-.btn--primary:hover,
-.btn--contrast:hover{ filter: brightness(.97); }
+.btn--primary:hover{ filter: brightness(.97); }
 
 /* Ховер шапки — из фрейма «Шапка Ховер». */
 .btn--ghost:hover{ background: var(--c-bg-contrast-pale); }
@@ -663,6 +763,7 @@ html, body{
   padding: 0 0 2px;
 }
 .rail__btn:hover{ background: var(--c-bg-contrast-pale); }
+.rail__btn--svg{ color: var(--c-icon-secondary); }
 .rail__btn--filled{ background: var(--c-bg-contrast-pale); }
 .rail__btn--help{
   background: var(--c-bg-info);
@@ -719,7 +820,8 @@ html, body{
   flex-wrap: wrap;
   align-content: flex-start;
   gap: var(--o-l);
-  padding-left: var(--o-m);
+  /* Сверху — пустая строка вкладок из макета (фрейм «Вкладки», 32 px). */
+  padding: var(--h-xl) 0 0 var(--o-m);
 }
 
 .tile{
@@ -993,6 +1095,14 @@ html, body{
   color: var(--c-text-label);
 }
 
+/* «↓ Посетители» на «Страницах» — подпись сортировки списка (88:120454). */
+.master__caption--sort{
+  align-items: center;
+  gap: 5px;
+  padding: 15px var(--o-m) 4px 0;
+  font-size: var(--fs-m);
+}
+
 .master__list{
   display: flex;
   flex-direction: column;
@@ -1218,6 +1328,64 @@ html, body{
   top: var(--o-2xs);
 }
 
+/* Мастер-колонка «Данных» — группа 119:21447: SEO / Параметры вплотную,
+   ниже через 20 px — блок «Можно добавить». */
+.master--data{ padding-top: 41px; }
+.master__list--flush{ gap: 0; }
+
+.addable{
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: var(--o-m) var(--o-xs) var(--o-l);
+  border-radius: var(--r-s);
+  background: var(--c-bg-active);
+}
+.addable__caption{
+  margin: 0;
+  padding-left: var(--o-s);
+  font-size: var(--fs-xs);
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--c-text-label-contrast);
+}
+.addable__list{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--o-3xs);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.addable__item{
+  height: var(--h-m);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--o-s);
+  border: 0;
+  border-radius: var(--r-m);
+  background: transparent;
+  font: inherit;
+  font-size: var(--fs-m);
+  letter-spacing: inherit;
+  color: var(--c-text-label-contrast);
+  cursor: pointer;
+}
+.addable__item:hover{ background: var(--c-bg-contrast-pale); color: var(--c-text); }
+
+.params__title{
+  margin: 0;
+  padding: var(--o-m) var(--o-m) 0;
+  font-size: var(--fs-3xl);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--c-text);
+}
+
 .params{
   width: 100%;
   display: flex;
@@ -1229,7 +1397,8 @@ html, body{
 
 .params__domain{
   display: flex;
-  align-items: center;
+  /* «Сменить» стоит на базовой линии домена, а не по центру строки. */
+  align-items: baseline;
   gap: var(--o-m);
   width: 100%;
   height: 56px;
@@ -2028,20 +2197,37 @@ html, body{
   gap: var(--o-m);
 }
 
-.siteparams{
-  grid-column: 1 / -1;
+/* Счётчики над карточками — 88:120329: колонки через 154 px,
+   подпись сверху (top 11), число ниже (top 36), иконка в 6 px справа. */
+.counters{
+  display: flex;
+  height: 80px;
+  margin: 0;
+  padding: 11px var(--o-m) 0;
+}
+.counter{
+  flex: none;
+  width: 154px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.counter__label{
+  font-size: var(--fs-m);
+  line-height: normal;
+  color: var(--c-text-label);
+}
+.counter__value{
   display: flex;
   align-items: center;
-  gap: var(--o-l);
-  height: 44px;
-  padding: 0 var(--o-m);
-  font-size: var(--fs-m);
+  gap: var(--o-xs);
+  height: 29px;
+  margin: 0;
+  font-size: var(--fs-3xl);
   color: var(--c-text);
-  white-space: nowrap;
-  overflow: hidden;
 }
-.siteparams__label{ font-size: var(--fs-l); font-weight: 600; }
-.siteparams__text{ min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.counter__value b{ font-size: var(--fs-5xl); font-weight: 600; line-height: normal; }
+.counter__value .icon{ font-size: var(--fs-5xl); color: var(--c-icon-unaccented); }
 
 .pagecard{
   display: flex;
@@ -2237,7 +2423,7 @@ html, body{
 <template id="tpl-tabs">
   <ul class="tabs">
     <li><a class="tab" href="#/screen-2" data-goto="screen-2"><span class="tab__label" data-label="Страницы"><span>Страницы</span></span><span class="tab__marker"></span></a></li>
-    <li><a class="tab" href="#/screen-3" data-goto="screen-3"><span class="tab__label" data-label="Параметры"><span>Параметры</span></span><span class="tab__marker"></span></a></li>
+    <li><a class="tab" href="#/screen-3" data-goto="screen-3"><span class="tab__label" data-label="Данные"><span>Данные</span></span><span class="tab__marker"></span></a></li>
     <li><a class="tab" href="#/screen-4" data-goto="screen-4"><span class="tab__label" data-label="Статистика"><span>Статистика</span></span><span class="tab__marker"></span></a></li>
     <li><a class="tab" href="#/screen-5" data-goto="screen-5"><span class="tab__label" data-label="Источники"><span>Источники</span></span><span class="tab__marker"></span></a></li>
     <li><a class="tab" href="#/screen-6" data-goto="screen-6"><span class="tab__label" data-label="Посетители"><span>Посетители</span></span><span class="tab__marker"></span></a></li>
@@ -2340,23 +2526,72 @@ html, body{
            Figma: 3861:65738
            --------------------------------------------------------------- -->
       <section class="screen is-active" id="screen-1" data-name="Стартовый экран" data-chrome data-no-tabs
-              data-rail="Настроить, Аналитика, Вид — список, Ссылка">
+              data-rail="Настроить, Аналитика, Вид — список, Сортировка, Отбор, Ссылка">
 
         <main class="workspace">
-          <header class="topbar">
+          <header class="topbar topbar--popups">
             <div class="topbar__left">
-              <button class="btn btn--primary" type="button" aria-label="Создать сайт">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path d="M16 8C16 8.55228 15.5523 9 15 9H9V15C9 15.5523 8.55228 16 8 16C7.44772 16 7 15.5523 7 15V9H1C0.447715 9 0 8.55228 0 8C0 7.44772 0.447715 7 1 7H7V1C7 0.447715 7.44772 0 8 0C8.55228 0 9 0.447715 9 1V7H15C15.5523 7 16 7.44772 16 8Z" fill="white"/>
-                </svg>
-              </button>
-              <button class="btn btn--contrast" type="button" aria-label="Ещё">
-                <i class="icon icon--m" aria-hidden="true">&#xE668;</i>
+              <!-- Меню «Добавить сайт» — Figma 57:11900. Открывается по «+»
+                   и встаёт левым верхним углом на его место, перекрывая кнопку. -->
+              <div class="popup-anchor">
+                <button class="btn btn--primary" type="button" aria-label="Добавить сайт"
+                        aria-haspopup="menu" aria-expanded="false" aria-controls="menu-addsite" data-menu="menu-addsite">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M16 8C16 8.55228 15.5523 9 15 9H9V15C9 15.5523 8.55228 16 8 16C7.44772 16 7 15.5523 7 15V9H1C0.447715 9 0 8.55228 0 8C0 7.44772 0.447715 7 1 7H7V1C7 0.447715 7.44772 0 8 0C8.55228 0 9 0.447715 9 1V7H15C15.5523 7 16 7.44772 16 8Z" fill="white"/>
+                  </svg>
+                </button>
+                <div class="menu" id="menu-addsite" role="menu" aria-labelledby="menu-addsite-title" hidden>
+                  <div class="menu__header">
+                    <span class="menu__title" id="menu-addsite-title">Добавить сайт</span>
+                    <button class="menu__close" type="button" aria-label="Закрыть" data-menu-close>
+                      <svg width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+                        <path d="M19.7917 18.875C19.9306 18.9861 20 19.1389 20 19.3333C20 19.5278 19.9306 19.6806 19.7917 19.7917C19.7361 19.875 19.6667 19.9306 19.5833 19.9583C19.5 19.9861 19.4167 20 19.3333 20C19.25 20 19.1667 19.9861 19.0833 19.9583C19 19.9306 18.9306 19.875 18.875 19.7917L14 14.9583L9.125 19.7917C9.06944 19.875 9 19.9306 8.91667 19.9583C8.83333 19.9861 8.75 20 8.66667 20C8.58333 20 8.5 19.9861 8.41667 19.9583C8.33333 19.9306 8.26389 19.875 8.20833 19.7917C8.06944 19.6806 8 19.5278 8 19.3333C8 19.1389 8.06944 18.9861 8.20833 18.875L13.0417 14L8.20833 9.125C8.06944 9.01389 8 8.86111 8 8.66667C8 8.47222 8.06944 8.31944 8.20833 8.20833C8.31944 8.06944 8.47222 8 8.66667 8C8.86111 8 9.01389 8.06944 9.125 8.20833L14 13.0417L18.875 8.20833C18.9861 8.06944 19.1389 8 19.3333 8C19.5278 8 19.6806 8.06944 19.7917 8.20833C19.9306 8.31944 20 8.47222 20 8.66667C20 8.86111 19.9306 9.01389 19.7917 9.125L14.9583 14L19.7917 18.875Z" fill="currentColor"/>
+                      </svg>
+                    </button>
+                  </div>
+                  <ul class="menu__list">
+                    <li><button class="menu__item" type="button" role="menuitem" data-menu-close>Подключить</button></li>
+                    <li><button class="menu__item" type="button" role="menuitem" data-menu-close>Создать новый</button></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <!-- У реестра своя правая часть шапки: поиск и фильтр без периода. -->
+            <div class="topbar__right">
+              <div class="search">Найти</div>
+              <button class="btn btn--ghost" type="button" aria-label="Фильтр">
+                <i class="icon icon--m icon--secondary" aria-hidden="true">&#xE94C;</i>
               </button>
             </div>
           </header>
 
           <div class="registry">
+
+            <article class="tile" data-goto="screen-2" tabindex="0" role="link" aria-label="Открыть сайт «Биллинговые системы»">
+              <!-- Пин: здесь кликают, чтобы открыть сайт. -->
+              <span class="pin" style="--pin-x: 214px; --pin-y: 9px" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M5.95663 13.9593C5.8644 13.9596 5.77429 13.9317 5.69843 13.8792C5.62257 13.8268 5.5646 13.7523 5.53232 13.6659L1.18093 1.92531C1.15345 1.84609 1.14858 1.76078 1.16687 1.67895C1.18515 1.59712 1.22587 1.52199 1.28445 1.462C1.34304 1.40201 1.41717 1.35953 1.49855 1.33931C1.57992 1.31909 1.66532 1.32194 1.74517 1.34753L13.4813 5.71697C13.5692 5.74994 13.6447 5.80953 13.6972 5.88744C13.7497 5.96534 13.7766 6.05768 13.7741 6.15158C13.7716 6.24548 13.7399 6.33627 13.6833 6.41129C13.6268 6.48631 13.5483 6.54182 13.4587 6.5701L9.6851 7.73017L13.4316 11.4767C13.5157 11.5613 13.5629 11.6757 13.5629 11.7949C13.5629 11.9142 13.5157 12.0286 13.4316 12.1132L11.9601 13.5847C11.9179 13.6265 11.8679 13.6596 11.8129 13.6821C11.7579 13.7045 11.699 13.7159 11.6396 13.7156C11.5802 13.7159 11.5213 13.7045 11.4663 13.6821C11.4113 13.6596 11.3613 13.6265 11.3191 13.5847L7.55906 9.82461L6.38545 13.6388C6.35799 13.7296 6.30266 13.8094 6.22732 13.8669C6.15197 13.9244 6.06042 13.9568 5.96566 13.9593H5.95663Z" fill="white"/><path d="M5.95663 13.9593C5.8644 13.9596 5.77429 13.9317 5.69843 13.8792C5.62257 13.8268 5.5646 13.7523 5.53232 13.6659L1.18093 1.92531C1.15345 1.84609 1.14858 1.76078 1.16687 1.67895C1.18515 1.59712 1.22587 1.52199 1.28445 1.462C1.34304 1.40201 1.41717 1.35953 1.49855 1.33931C1.57992 1.31909 1.66532 1.32194 1.74517 1.34753L13.4813 5.71697C13.5692 5.74994 13.6447 5.80953 13.6972 5.88744C13.7497 5.96534 13.7766 6.05768 13.7741 6.15158C13.7716 6.24548 13.7399 6.33627 13.6833 6.41129C13.6268 6.48631 13.5483 6.54182 13.4587 6.5701L9.6851 7.73017L13.4316 11.4767C13.5157 11.5613 13.5629 11.6757 13.5629 11.7949C13.5629 11.9142 13.5157 12.0286 13.4316 12.1132L11.9601 13.5847C11.9179 13.6265 11.8679 13.6596 11.8129 13.6821C11.7579 13.7045 11.699 13.7159 11.6396 13.7156C11.5802 13.7159 11.5213 13.7045 11.4663 13.6821C11.4113 13.6596 11.3613 13.6265 11.3191 13.5847L7.55906 9.82461L6.38545 13.6388C6.35799 13.7296 6.30267 13.8094 6.22732 13.8669C6.15197 13.9244 6.06042 13.9568 5.96566 13.9593H5.95663ZM7.35142 8.54267C7.41083 8.54232 7.46972 8.55371 7.52471 8.57617C7.57971 8.59864 7.62973 8.63174 7.67191 8.67357L11.6396 12.6413L12.4657 11.7927L8.51149 7.8385C8.45675 7.78354 8.41711 7.71539 8.39637 7.64064C8.37564 7.5659 8.37452 7.48706 8.39312 7.41176C8.41172 7.33645 8.44941 7.26721 8.50256 7.21071C8.55571 7.15421 8.62253 7.11236 8.69656 7.0892L11.915 6.09614L2.35454 2.53468L5.916 12.1041L6.91809 8.85413C6.94055 8.77969 6.98186 8.71233 7.03801 8.65855C7.09416 8.60477 7.16324 8.56641 7.23857 8.54718L7.35142 8.54267Z" fill="black"/></svg></span>
+              <div class="tile__head">
+                <div class="tile__row">
+                  <h3 class="tile__title">Биллинговые системы</h3>
+                  <div class="tile__stats">
+                    <span class="tile__num">0</span>
+                    <i class="icon icon--label" aria-hidden="true">&#xE732;</i>
+                  </div>
+                </div>
+                <div class="tile__row">
+                  <span class="tile__link">s-billing.saby.ws</span>
+                  <div class="tile__visits">
+                    <span class="tile__num">0</span>
+                    <i class="icon icon--label" aria-hidden="true">&#xEB6B;</i>
+                  </div>
+                </div>
+              </div>
+              <div class="tile__shot" style="background-image:var(--shot-billing)" role="img" aria-label="Превью сайта s-billing.saby.ws"></div>
+              <div class="tile__options">
+                <button class="tile__opt" type="button" aria-label="Открыть сайт"><i class="icon" aria-hidden="true">&#xE9BC;</i></button>
+                <button class="tile__opt" type="button" aria-label="Ещё"><i class="icon" aria-hidden="true">&#xE9D9;</i></button>
+              </div>
+            </article>
 
             <article class="tile">
               <div class="tile__head">
@@ -2482,30 +2717,6 @@ html, body{
               </div>
             </article>
 
-            <article class="tile" data-goto="screen-2" tabindex="0" role="link" aria-label="Открыть сайт «Биллинговые системы»">
-              <div class="tile__head">
-                <div class="tile__row">
-                  <h3 class="tile__title">Биллинговые системы</h3>
-                  <div class="tile__stats">
-                    <span class="tile__num">0</span>
-                    <i class="icon icon--label" aria-hidden="true">&#xE732;</i>
-                  </div>
-                </div>
-                <div class="tile__row">
-                  <span class="tile__link">s-billing.saby.ws</span>
-                  <div class="tile__visits">
-                    <span class="tile__num">0</span>
-                    <i class="icon icon--label" aria-hidden="true">&#xEB6B;</i>
-                  </div>
-                </div>
-              </div>
-              <div class="tile__shot" style="background-image:var(--shot-billing)" role="img" aria-label="Превью сайта s-billing.saby.ws"></div>
-              <div class="tile__options">
-                <button class="tile__opt" type="button" aria-label="Открыть сайт"><i class="icon" aria-hidden="true">&#xE9BC;</i></button>
-                <button class="tile__opt" type="button" aria-label="Ещё"><i class="icon" aria-hidden="true">&#xE9D9;</i></button>
-              </div>
-            </article>
-
           </div>
         </main>
 
@@ -2520,25 +2731,20 @@ html, body{
           <div class="content">
 
             <aside class="master">
-              <div class="card summary">
-                <div class="summary__row">
-                  <label><span class="summary__box"></span>Новые за период</label>
-                  <span class="summary__num">886</span>
-                </div>
-                <div class="summary__row">
-                  <label><span class="summary__box"></span>Больше 1 визита</label>
-                  <span class="summary__num">656</span>
-                </div>
+              <!-- Сводка «Новые / Больше 1 визита» переехала в счётчики над карточками. -->
+              <div class="master__caption master__caption--sort">
+                <svg width="7" height="16" viewBox="0 0 7 16" fill="none" aria-hidden="true">
+                  <path d="M3.5 0V15M0.5 12L3.5 15L6.5 12" stroke="currentColor"/>
+                </svg>
+                Посетители
               </div>
-
-              <div class="master__caption">Посетители</div>
 
               <ul class="master__list">
                 <li class="master__item master__item--selected">
                   <span class="master__name">Всего</span><span class="master__count">1 667 626</span>
                 </li>
                 <li class="master__item">
-                  <span class="master__name">Главная</span><span class="master__count">851 546</span>
+                  <span class="master__name">Главная s-billing.saby.ws</span><span class="master__count">851 546</span>
                 </li>
                 <li class="master__item">
                   <span class="master__name">Цена</span><span class="master__count">601 245</span>
@@ -2555,10 +2761,31 @@ html, body{
             <div class="detail detail--scroll">
               <div class="pagecards">
 
-                <div class="card siteparams">
-                  <span class="siteparams__label">Параметры</span>
-                  <span class="siteparams__text">Поисковая индексация; Счетчик - подключен; Яндекс.Вебмастер,...</span>
-                </div>
+                <!-- Счётчики посетителей — «Создание и настройка сайтов», 88:120329.
+                     В макете колонка уже, и «Продажи» уезжают под стрелку прокрутки;
+                     у нас ширины хватает на все пять. -->
+                <dl class="card counters">
+                  <div class="counter">
+                    <dt class="counter__label">Новые</dt>
+                    <dd class="counter__value"><b>98</b><i class="icon" aria-hidden="true">&#xEC98;</i></dd>
+                  </div>
+                  <div class="counter">
+                    <dt class="counter__label">Больше 1 визита</dt>
+                    <dd class="counter__value"><b>26</b><i class="icon" aria-hidden="true">&#xE755;</i></dd>
+                  </div>
+                  <div class="counter">
+                    <dt class="counter__label">Среднее время</dt>
+                    <dd class="counter__value"><span>07:23</span><i class="icon" aria-hidden="true">&#xE68D;</i></dd>
+                  </div>
+                  <div class="counter">
+                    <dt class="counter__label">Заявки</dt>
+                    <dd class="counter__value"><b>0</b><i class="icon" aria-hidden="true">&#xE732;</i></dd>
+                  </div>
+                  <div class="counter">
+                    <dt class="counter__label">Продажи</dt>
+                    <dd class="counter__value"><b>0</b><i class="icon" aria-hidden="true">&#xE60E;</i><span>0.0%</span></dd>
+                  </div>
+                </dl>
 
                 <article class="card pagecard">
                   <div class="pagecard__row">
@@ -2624,35 +2851,39 @@ html, body{
       </section>
 
       <!-- ---------------------------------------------------------------
-           3 · Параметры — Figma: 3861:65830
+           3 · Данные (бывшие «Параметры») — Figma: 3861:65830,
+               мастер-колонка — «Создание и настройка сайтов», 119:21447
            --------------------------------------------------------------- -->
-      <section class="screen" id="screen-3" data-name="Параметры" data-chrome data-sitebar
+      <section class="screen" id="screen-3" data-name="Данные" data-chrome data-sitebar
               data-rail="Настроить, Аналитика, Ссылка, Просмотр, Снять с публикации">
         <main class="workspace">
           <div class="content">
 
-            <aside class="master">
-              <div class="master__caption master__caption--tight">Посетители</div>
-              <ul class="master__list">
+            <!-- Разделы данных, а не страницы сайта: опций записи у пунктов нет. -->
+            <aside class="master master--data" data-no-options>
+              <ul class="master__list master__list--flush">
                 <li class="master__item master__item--selected">
-                  <span class="master__name">Сайт</span><span class="master__count">1 667 626</span>
+                  <span class="master__name">SEO</span>
                 </li>
                 <li class="master__item">
-                  <span class="master__name">Главная</span>
-                  <i class="icon icon--img icon--img24" style="background-image:var(--icon-home)" aria-hidden="true"></i>
-                  <span class="master__count">851 546</span>
-                </li>
-                <li class="master__item">
-                  <span class="master__name">Цена</span><span class="master__count">601 245</span>
-                </li>
-                <li class="master__item">
-                  <span class="master__name">Контакты</span><span class="master__count">575 893</span>
+                  <span class="master__name">Параметры</span>
                 </li>
               </ul>
+
+              <section class="addable" aria-labelledby="addable-title">
+                <h3 class="addable__caption" id="addable-title">Можно добавить</h3>
+                <ul class="addable__list">
+                  <li><button class="addable__item" type="button">Каталог</button></li>
+                  <li><button class="addable__item" type="button">Папка с файлами</button></li>
+                  <li><button class="addable__item" type="button">Филиалы</button></li>
+                  <li><button class="addable__item" type="button">Новости</button></li>
+                </ul>
+              </section>
             </aside>
 
             <div class="detail detail--flush">
               <div class="params">
+                <h2 class="params__title">SEO</h2>
                 <div class="params__domain">
                   <span class="params__url">s-billing.saby.ws</span>
                   <button class="params__change" type="button">Сменить</button>
@@ -2666,7 +2897,7 @@ html, body{
 
                   <div class="field">
                     <span class="field__label">Поисковая индексация</span>
-                    <svg width="24" height="16" viewBox="0 0 24 16" fill="none" aria-hidden="true" opacity=".3">
+                    <svg width="24" height="16" viewBox="0 0 24 16" fill="none" aria-hidden="true">
                       <rect width="24" height="16" rx="8" fill="#F6733C"/>
                       <circle cx="16" cy="8" r="6" fill="white"/>
                     </svg>
@@ -3542,7 +3773,10 @@ html, body{
     'Просмотр':           '',
     'Снять с публикации': '',
     'График':             '',
-    'Отправить':          ''
+    'Отправить':          '',
+    'Отбор':              '',
+    /* Сортировки в cbuc-icons24 нет — SVG из макета. */
+    'Сортировка':         '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M18.9908 3H19.9885V19.086L22.6357 16.4329L23.3411 17.1409L19.4917 21L15.6411 17.1409L16.3465 16.4329L18.9908 19.086V3ZM4.53917 8C4.53917 9.654 5.8676 11 7.5 11C9.1324 11 10.4608 9.654 10.4608 8C10.4608 6.346 9.1324 5 7.5 5C5.8676 5 4.53917 6.346 4.53917 8ZM5.52612 8C5.52612 6.896 6.41042 6 7.5 6C8.5886 6 9.47388 6.896 9.47388 8C9.47388 9.104 8.58958 10 7.5 10C6.41042 10 5.52612 9.104 5.52612 8ZM2.00272 15.225L1 19H14L12.9982 15.225C12.6508 13.915 11.4794 13 10.147 13H4.85398C3.52161 13 2.35013 13.915 2.00272 15.225ZM12.711 18H2.28699L2.95515 15.484C3.18609 14.61 3.96676 14 4.85205 14H10.145C11.0313 14 11.811 14.61 12.0419 15.484L12.711 18Z" fill="currentColor"/></svg>'
   };
 
   function railButtons(rail, list){
@@ -3554,8 +3788,13 @@ html, body{
       b.type = 'button';
       b.className = 'rail__btn';
       b.setAttribute('aria-label', name);
-      b.innerHTML = '<i class="icon icon--m icon--secondary" aria-hidden="true"></i>';
-      b.firstChild.textContent = glyph;
+      if (glyph.charAt(0) === '<') {
+        b.classList.add('rail__btn--svg');
+        b.innerHTML = glyph;
+      } else {
+        b.innerHTML = '<i class="icon icon--m icon--secondary" aria-hidden="true"></i>';
+        b.firstChild.textContent = glyph;
+      }
       rail.querySelector('.rail__top').appendChild(b);
     });
   }
@@ -3582,7 +3821,7 @@ html, body{
     }
 
     /* Опции записи — в каждый пункт мастер-колонки; видны только на ховере. */
-    Array.prototype.forEach.call(s.querySelectorAll('.master__item'), function(item){
+    Array.prototype.forEach.call(s.querySelectorAll('.master:not([data-no-options]) .master__item'), function(item){
       item.appendChild(stamp('tpl-master-options'));
     });
 
@@ -3622,7 +3861,7 @@ html, body{
     device: 'monitor',
     scenarios: [{ id: 'typical', title: 'Типовое представление' }],
     links: [{ title: 'Макет — Типовое представление', href: 'https://www.figma.com/design/zdSksnoJrOiDyzWNokEfzk/?node-id=3861-70224' }],
-    team: [{ label: 'Design', name: 'Смирнова Мария' }, { label: 'Develop' }],
+    team: [{ label: 'Design', name: 'Пахтусова Ирина' }, { label: 'Develop' }],
     value: { scenario: 'typical' }
   });
 
@@ -3654,8 +3893,31 @@ html, body{
     go(t.dataset.goto);
   });
 
+  /* --- выпадающие меню: data-menu="id" открывает, data-menu-close и клик
+         мимо — закрывают. Открытым держим одно меню. ----------------------- */
+  function closeMenus(){
+    Array.prototype.forEach.call(document.querySelectorAll('.menu:not([hidden])'), function(m){
+      m.hidden = true;
+      var opener = document.querySelector('[data-menu="' + m.id + '"]');
+      if (opener) opener.setAttribute('aria-expanded', 'false');
+    });
+  }
+  document.addEventListener('click', function(e){
+    var opener = e.target.closest('[data-menu]');
+    if (opener){
+      var menu = document.getElementById(opener.dataset.menu);
+      var wasOpen = !menu.hidden;
+      closeMenus();
+      if (!wasOpen){ menu.hidden = false; opener.setAttribute('aria-expanded', 'true'); }
+      return;
+    }
+    if (e.target.closest('[data-menu-close]') || !e.target.closest('.menu')) closeMenus();
+  });
+  window.addEventListener('hashchange', closeMenus);
+
   /* --- клавиатура ----------------------------------------------------------- */
   document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') { closeMenus(); return; }
     if (e.metaKey || e.ctrlKey || e.altKey) return;
 
     // Enter на плитке-ссылке ведёт себя как клик
